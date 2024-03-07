@@ -1,0 +1,13 @@
+proc main int
+do
+    19 # age
+
+    # if your age >= 20 you are old
+    if copy 21 >= do
+        1 # You can drink alcohol
+        swap drop
+    else
+        0 # You can't drink alcohol
+        swap drop
+    end
+end

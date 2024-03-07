@@ -1,0 +1,9 @@
+proc double int int
+do
+    copy +
+end
+
+proc main int 
+do
+    10 double
+end

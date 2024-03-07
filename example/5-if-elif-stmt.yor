@@ -1,0 +1,22 @@
+proc main int
+do
+    # score
+    79
+
+    if copy 80 >= do
+        65 # ASCII for 'A'
+        swap drop
+    elif copy 68 >= do
+        66 # ASCII for 'B'
+        swap drop
+    elif copy 45 >= do
+        67 # ASCII for 'C'
+        swap drop
+    elif copy 30 >= do
+        68 # ASCII for 'D'
+        swap drop
+    else
+        69 # ASCII for 'E'
+        swap drop
+    end
+end

@@ -1,0 +1,18 @@
+extern proc InitWindow int int ptr void end
+extern proc CloseWindow void  end
+extern proc WindowShouldClose bool end
+extern proc BeginDrawing void end
+extern proc EndDrawing void end
+
+proc main int do
+    800 600 "My Window" InitWindow
+
+    while WindowShouldClose true != do
+        BeginDrawing
+        EndDrawing
+    end
+
+    CloseWindow
+    0
+end
+

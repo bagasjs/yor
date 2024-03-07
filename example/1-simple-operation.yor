@@ -1,0 +1,5 @@
+# Welcome to yor program
+proc main int
+do
+    34 35 + # This is just a simple operation in yor
+end
