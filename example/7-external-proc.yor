@@ -3,11 +3,17 @@ extern proc CloseWindow void  end
 extern proc WindowShouldClose bool end
 extern proc BeginDrawing void end
 extern proc EndDrawing void end
+extern proc ClearBackground int void end
+
+proc get_red_color int do
+    4278190335 # The hexadecimal of RED -> 0xFF0000FF
+end
 
 proc main int do
     800 600 "My Window" InitWindow
 
     while WindowShouldClose true != do
+        get_red_color ClearBackground
         BeginDrawing
         EndDrawing
     end
