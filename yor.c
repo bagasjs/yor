@@ -1011,6 +1011,7 @@ int compile_program_to_nasm_x86_64(const Program *program, FILE *f)
                     if(inst.as._end.is_end_of_a_process) {
                         if(inst.as._end.return_type != DATA_TYPE_VOID) 
                             fprintf(f, "    pop rax ;; -- return value\n");
+                        fprintf(f, "    pop rbp\n");
                         fprintf(f, "    ret\n");
                     } else {
                         if(program->insts.data[inst.as._end.jt.next].kind == INST_WHILE) 
@@ -1026,6 +1027,8 @@ int compile_program_to_nasm_x86_64(const Program *program, FILE *f)
                 {
                     fprintf(f, ";; --- define proc `"SV_FMT"` --- \n", SV_ARGV(inst.as._def_proc.name));
                     fprintf(f, SV_FMT":\n", SV_ARGV(inst.as._def_proc.name));
+                    fprintf(f, "    push rbp\n");
+                    fprintf(f, "    mov  rbp, rsp\n");
                     assert(inst.as._def_proc.params.count <= 5 && "Currently a process could only have 5 parameters");
                     for(int i = (int)inst.as._def_proc.params.count - 1; i >= 0; --i) 
                         fprintf(f, "    push %s\n", param_regs[i]);
@@ -1033,6 +1036,7 @@ int compile_program_to_nasm_x86_64(const Program *program, FILE *f)
             case INST_CALL_PROC:
                 {
                     fprintf(f, "    ;; --- call proc --- \n");
+                    fprintf(f, "    mov rax, 0\n");
                     for(int i = (int)inst.as._def_proc.params.count - 1; i >= 0; --i) 
                         fprintf(f, "    pop %s\n", param_regs[i]);
                     fprintf(f, "    call "SV_FMT"\n", SV_ARGV(inst.as._call_proc.name));

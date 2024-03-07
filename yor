@@ -2,8 +2,9 @@
 
 set -xe
 ./yorcc $@
+NAME="output"
 
-nasm -g -felf64 output.s
-ld -o output output.o -lraylib -lc -lm -dynamic-linker /lib64/ld-linux-x86-64.so.2
-rm output.o
-./output
+nasm -g -felf64 $NAME.s
+ld -o $NAME $NAME.o -lraylib -lc -lm -dynamic-linker /lib64/ld-linux-x86-64.so.2
+rm $NAME.o
+./$NAME
