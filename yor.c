@@ -39,6 +39,7 @@ typedef enum Token_Kind {
 
     TOK_PROC,
     TOK_EXTERN,
+    TOK_INCLUDE,
 
     TOK_EOF,
 
@@ -80,6 +81,7 @@ static struct Token_Info token_infos[COUNT_TOKENS] = {
 
     [TOK_PROC] = { .kind = TOK_PROC, .name = "TOK_PROC", },
     [TOK_EXTERN] = { .kind = TOK_EXTERN, .name = "TOK_EXTERN", },
+    [TOK_INCLUDE] = { .kind = TOK_INCLUDE, .name = "TOK_INCLUDE", },
 
     [TOK_EOF] = { .kind = TOK_EOF, .name = "TOK_EOF", },
 };
@@ -202,6 +204,8 @@ bool lex_tokenize(Lex_State *lexer, Token *result)
                         result->kind = TOK_PROC;
                     } else if(sv_eq(result->text, SV("extern"))) {
                         result->kind = TOK_EXTERN;
+                    } else if(sv_eq(result->text, SV("include"))) {
+                        result->kind = TOK_EXTERN;
                     } else if(sv_eq(result->text, SV("true"))) {
                         result->kind = TOK_TRUE;
                     } else if(sv_eq(result->text, SV("false"))) {
@@ -279,6 +283,7 @@ typedef enum Inst_Kind {
     INST_DEFINE_PROC,
     INST_CALL_PROC,
     INST_EXTERNAL_PROC,
+    INST_INCLUDE,
 
     COUNT_INSTRUCTIONS,
 } Inst_Kind;
@@ -304,6 +309,7 @@ static struct Inst_Info inst_infos[COUNT_INSTRUCTIONS] = {
     [INST_DEFINE_PROC] = { .kind = INST_DEFINE_PROC, .name = "INST_DEFINE_PROC", },
     [INST_CALL_PROC] = { .kind = INST_CALL_PROC, .name = "INST_CALL_PROC", },
     [INST_EXTERNAL_PROC] = { .kind = INST_EXTERNAL_PROC, .name = "INST_EXTERNAL_PROC", },
+    [INST_INCLUDE] = { .kind = INST_INCLUDE, .name = "INST_INCLUDE", },
 };
 
 typedef enum Data_Type {
@@ -372,6 +378,7 @@ typedef struct Inst {
         Proc _def_proc;
         Proc _external_proc;
         Proc _call_proc;
+        String_View include;
     } as;
 } Inst;
 
@@ -481,6 +488,13 @@ bool parse_instruction(Lex_State *lex, Inst *result)
             {
                 result->kind = INST_OPERATION;
                 result->as.operation = OP_GE;
+            } break;
+        case TOK_INCLUDE:
+            {
+                result->kind = INST_INCLUDE;
+                assert(lex_next(lex, &token) && "Expecting a `string` after `include`");
+                assert(token.kind == TOK_STRING && "Expecting a `string` after `include`");
+                result->as.include = token.text;
             } break;
         case TOK_PROC:
             {
@@ -624,8 +638,11 @@ Program load_program_from_source(const char *source)
 
     // Load the program
     Inst inst;
-    while(parse_instruction(&lexer, &inst)) 
+    while(parse_instruction(&lexer, &inst)) {
+        if(inst.kind == INST_INCLUDE)
+            continue;
         da_append(&result.insts, inst);
+    }
 
     da(Proc) procs;
 
@@ -1210,5 +1227,6 @@ int main(int argc, char **argv)
     assert(f && "Failed to open output file");
     int result = compile_program_to_nasm_x86_64(&program, f);
     unload_program(program);
+    free(file_content);
     return result;
 }
