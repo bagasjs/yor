@@ -1,0 +1,6 @@
+extern proc display ptr int void end
+
+proc main int do
+    "Hello, World" 12 display
+    0
+end
